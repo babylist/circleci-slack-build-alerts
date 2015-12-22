@@ -51,8 +51,11 @@ app.get '/', (req, res) ->
 
 app.post '/', (req, res) ->
   return res.send 400, 'No payload' unless req.body.payload?
-  {build_url, branch, status} = req.body.payload
-  console.log req.body.payload
+  {build_url, branch, status, build_parameters} = req.body.payload
+
+  # Add the TAG if present so we can distinguish in slack
+  if build_parameters.TAG
+    branch = "#{ branch } - #{ build_parameters.TAG }"
 
   if branch != requireEnv 'GIT_BRANCH'
     return res.send 200, 'Ignored (wrong git branch)'
@@ -68,6 +71,9 @@ app.post '/', (req, res) ->
     payload.icon_emoji = ':white_check_mark:'
     payload.text = "@channel #{ branch } build fixed. <#{ build_url }|See details...>"
     #payload.text = "@channel #{ branch } build failed! <#{ build_url }|See details...>\nhttp://i.imgur.com/TVVFOhS.gif"
+  else if status == 'success' && build_parameters.TAG
+    payload.icon_emoji = ':white_check_mark:'
+    payload.text = "@channel #{ branch } build success. <#{ build_url }|See details...>"
   else
     return res.send 200, 'Ignored (only want fixed/failed status)'
 
