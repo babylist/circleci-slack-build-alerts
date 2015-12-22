@@ -52,15 +52,13 @@ app.get '/', (req, res) ->
 app.post '/', (req, res) ->
   return res.send 400, 'No payload' unless req.body.payload?
   {build_url, branch, status, build_parameters} = req.body.payload
-  console.log status
-
-  # Add the TAG if present so we can distinguish in slack
-  if build_parameters.TAG?
-    branch = "#{ branch } - #{ build_parameters.TAG }"
-    console.log branch
 
   if branch != requireEnv 'GIT_BRANCH'
     return res.send 200, 'Ignored (wrong git branch)'
+
+   # Add the TAG if present so we can distinguish in slack
+  if build_parameters.TAG?
+    branch = "#{ branch } - #{ build_parameters.TAG }"
 
   payload =
     channel: requireEnv 'SLACK_CHANNEL'
