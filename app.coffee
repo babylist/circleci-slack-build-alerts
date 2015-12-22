@@ -52,6 +52,7 @@ app.get '/', (req, res) ->
 app.post '/', (req, res) ->
   return res.send 400, 'No payload' unless req.body.payload?
   {build_url, branch, status} = req.body.payload
+  console.log req.body.payload
 
   if branch != requireEnv 'GIT_BRANCH'
     return res.send 200, 'Ignored (wrong git branch)'
