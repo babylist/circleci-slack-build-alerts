@@ -57,7 +57,7 @@ app.post '/', (req, res) ->
     return res.send 200, 'Ignored (wrong git branch)'
 
    # Add the TAG if present so we can distinguish in slack
-  if build_parameters.TAG?
+  if build_parameters && build_parameters.TAG?
     branch = "#{ branch } - #{ build_parameters.TAG }"
 
   payload =
@@ -71,7 +71,7 @@ app.post '/', (req, res) ->
     payload.icon_emoji = ':white_check_mark:'
     payload.text = "@channel #{ branch } build fixed. <#{ build_url }|See details...>"
     #payload.text = "@channel #{ branch } build failed! <#{ build_url }|See details...>\nhttp://i.imgur.com/TVVFOhS.gif"
-  else if status == 'success' && build_parameters.TAG?
+  else if status == 'success'
     payload.icon_emoji = ':white_check_mark:'
     payload.text = "@channel #{ branch } build success. <#{ build_url }|See details...>"
   else
